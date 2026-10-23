@@ -53,14 +53,23 @@ bundled library, renders the sheet, reads the checker's report and fixes what it
 
 ## Install
 
-The skill is the `dimensional-drawing/` folder. Put it where your agent looks for skills.
+With the [`skills`](https://github.com/vercel-labs/skills) CLI, which installs for Claude Code,
+Codex, Cursor and many other agents (it asks which):
+
+```sh
+npx skills add Blueemi/dimension-draw-skill          # this project
+npx skills add Blueemi/dimension-draw-skill -g       # all your projects
+```
+
+Or by hand: the skill is the `skills/dimensional-drawing/` folder, so put it where your agent
+looks for skills.
 
 **Claude Code**, for all your projects:
 
 ```sh
 git clone https://github.com/Blueemi/dimension-draw-skill.git
 mkdir -p ~/.claude/skills
-ln -s "$PWD/dimension-draw-skill/dimensional-drawing" ~/.claude/skills/dimensional-drawing
+ln -s "$PWD/dimension-draw-skill/skills/dimensional-drawing" ~/.claude/skills/dimensional-drawing
 ```
 
 Use `cp -R` instead of `ln -s` if you'd rather have a copy. To install it for one project
@@ -69,14 +78,14 @@ only, use `.claude/skills/` inside that project.
 **Codex:** `~/.codex/skills/dimensional-drawing`.
 
 **Other agents that read Agent Skills:** `~/.agents/skills/dimensional-drawing`, or point the
-agent at `dimensional-drawing/SKILL.md`.
+agent at `skills/dimensional-drawing/SKILL.md`.
 
 **Claude apps (claude.ai, desktop):** zip the folder and upload it in Settings under Skills.
 Code execution must be on.
 
 ```sh
-cd dimension-draw-skill
-zip -r dimensional-drawing.zip dimensional-drawing -x '*/__pycache__/*' '*/examples/out/*'
+cd dimension-draw-skill/skills
+zip -r ../dimensional-drawing.zip dimensional-drawing -x '*/__pycache__/*' '*/examples/out/*'
 ```
 
 ### Requirements
@@ -110,7 +119,7 @@ SVG, PNG and PDF.
 
 ```python
 import sys
-sys.path.insert(0, "dimensional-drawing/scripts")
+sys.path.insert(0, "skills/dimensional-drawing/scripts")
 from dimdraw import Sheet
 
 sh = Sheet("D", product="Widget", company="Acme Inc.")
@@ -130,7 +139,7 @@ The skill's `SKILL.md` is the workflow the agent follows. The full API is in
 ## What's in the folder
 
 ```
-dimensional-drawing/
+skills/dimensional-drawing/
   SKILL.md                    workflow and rules the agent follows
   references/style-guide.md   what Apple puts on these sheets, and where
   references/api.md           full API
@@ -146,14 +155,14 @@ dimensional-drawing/
   examples/car.py             3-D vehicle: lofted body, wheels, package dimensions, ramp angles
 ```
 
-Run an example with `python3 dimensional-drawing/examples/car.py`. Output goes to
-`dimensional-drawing/examples/out/`.
+Run an example with `python3 skills/dimensional-drawing/examples/car.py`. Output goes to
+`skills/dimensional-drawing/examples/out/`.
 
 ## Development
 
 ```sh
 python3 -m unittest discover -s tests -v          # library unit tests
-python3 dimensional-drawing/scripts/selftest.py   # render every example, fail on any check problem
+python3 skills/dimensional-drawing/scripts/selftest.py   # render every example, fail on any check problem
 ```
 
 CI runs both on Python 3.9, 3.12 and 3.13.
@@ -170,7 +179,7 @@ CI runs both on Python 3.9, 3.12 and 3.13.
 ## License and credits
 
 MIT, see [LICENSE](LICENSE). The heading fonts are the Hershey fonts, whose notice is in
-`dimensional-drawing/assets/HERSHEY-FONTS-LICENSE.txt`.
+`skills/dimensional-drawing/assets/HERSHEY-FONTS-LICENSE.txt`.
 
 The visual style follows Apple's published dimensional drawings. This project is not affiliated
 with or endorsed by Apple Inc. The example products and companies are fictional, and the skill

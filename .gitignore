@@ -2,8 +2,8 @@ __pycache__/
 *.pyc
 .DS_Store
 
-# example renders (regenerate with python3 dimensional-drawing/examples/<name>.py)
-dimensional-drawing/examples/out/
+# example renders (regenerate with python3 skills/dimensional-drawing/examples/<name>.py)
+skills/dimensional-drawing/examples/out/
 *.check.svg
 *.check.png
 *.grid.svg

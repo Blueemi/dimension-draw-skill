@@ -11,7 +11,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
-                                "dimensional-drawing", "scripts"))
+                                "skills", "dimensional-drawing", "scripts"))
 
 from dimdraw import Model, Sheet, spline  # noqa: E402
 
