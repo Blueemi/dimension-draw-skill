@@ -6,8 +6,20 @@ drawings in the style of Apple's
 any object. Phones and brackets are drawn as 2-D views. Coffee makers, cars and other complex
 products are drawn from a 3-D model.
 
-Ask your agent for "a dimension drawing of …" and it writes a short Python script with the
-bundled library, renders the sheet, reads the checker's report and fixes what it finds.
+## Install
+
+```sh
+npx skills add Blueemi/dimension-draw-skill
+```
+
+Add `-g` to install it for all your projects instead of the current one. The
+[`skills`](https://github.com/vercel-labs/skills) CLI asks which agents to install it for
+(Claude Code, Codex, Cursor and many more). Then ask your agent for "a dimension drawing of …".
+It writes a short Python script with the bundled library, renders the sheet, reads the
+checker's report and fixes what it finds.
+
+Needs Python 3.8 or newer, and nothing else. See [Requirements](#requirements) for PNG and PDF
+output, and [Other ways to install](#other-ways-to-install).
 
 ![phone case design guide](docs/images/handset-overview.png)
 
@@ -51,18 +63,46 @@ bundled library, renders the sheet, reads the checker's report and fixes what it
   - overall sizes that a part sticks out past, naming the part
 - **Output:** SVG (the master copy), PNG, and single- or multi-page PDF.
 
-## Install
+## Use it
 
-With the [`skills`](https://github.com/vercel-labs/skills) CLI, which installs for Claude Code,
-Codex, Cursor and many other agents (it asks which):
+Ask in plain words and give real dimensions where you have them:
 
-```sh
-npx skills add Blueemi/dimension-draw-skill          # this project
-npx skills add Blueemi/dimension-draw-skill -g       # all your projects
+> Make a dimensional drawing of a drip coffee maker: base 210 × 240 mm, 334 mm tall, glass
+> carafe with a handle. Front, side, section through the carafe and an iso view.
+
+> Make an Apple-style case design guide for this phone: 71.5 × 149.6 × 8.25 mm, …
+
+> Draw a vehicle package drawing for a compact SUV: 4600 long, 1855 wide, 1685 tall,
+> 2690 wheelbase, with approach and departure angles.
+
+The agent tells you which numbers it estimated and what it simplified. Each sheet comes out as
+SVG, PNG and PDF.
+
+### Using the library directly
+
+```python
+import sys
+sys.path.insert(0, "skills/dimensional-drawing/scripts")   # the skill's scripts/ folder
+from dimdraw import Sheet
+
+sh = Sheet("D", product="Widget", company="Acme Inc.")
+sh.notes(["DIMENSIONS ARE NOMINAL."])
+sh.title_block(title="WIDGET\nDIMENSIONS", drawing_number="ACME-0001", rev="A")
+v = sh.view(x=300, y=300, scale=3.0, name="front")
+body = v.rect(0, 0, 60, 40, r=4)
+v.dim_h(body.tl, body.tr, offset=10, ref=body, label="PRODUCT\nWIDTH")
+v.dim_v(body.tr, body.br, offset=10, ref=body, label="PRODUCT\nHEIGHT")
+sh.save("out/widget.svg", pdf=True)      # prints the CHECK report
 ```
 
-Or by hand: the skill is the `skills/dimensional-drawing/` folder, so put it where your agent
-looks for skills.
+The skill's `SKILL.md` is the workflow the agent follows. The full API is in
+`references/api.md`, and the guide to modelling complex objects is in
+`references/modeling.md`.
+
+## Other ways to install
+
+The skill is the `skills/dimensional-drawing/` folder. Put it wherever your agent looks for
+skills.
 
 **Claude Code**, for all your projects:
 
@@ -88,7 +128,7 @@ cd dimension-draw-skill/skills
 zip -r ../dimensional-drawing.zip dimensional-drawing -x '*/__pycache__/*' '*/examples/out/*'
 ```
 
-### Requirements
+## Requirements
 
 - **Python 3.8 or newer**, and nothing else. The library, including the 3-D engine, is pure
   Python.
@@ -99,42 +139,6 @@ zip -r ../dimensional-drawing.zip dimensional-drawing -x '*/__pycache__/*' '*/ex
   - `cairosvg`
 
   Without one, you get the SVG only.
-
-## Use it
-
-Ask in plain words and give real dimensions where you have them:
-
-> Make a dimensional drawing of a drip coffee maker: base 210 × 240 mm, 334 mm tall, glass
-> carafe with a handle. Front, side, section through the carafe and an iso view.
-
-> Make an Apple-style case design guide for this phone: 71.5 × 149.6 × 8.25 mm, …
-
-> Draw a vehicle package drawing for a compact SUV: 4600 long, 1855 wide, 1685 tall,
-> 2690 wheelbase, with approach and departure angles.
-
-The agent tells you which numbers it estimated and what it simplified. Each sheet comes out as
-SVG, PNG and PDF.
-
-### Using the library directly
-
-```python
-import sys
-sys.path.insert(0, "skills/dimensional-drawing/scripts")
-from dimdraw import Sheet
-
-sh = Sheet("D", product="Widget", company="Acme Inc.")
-sh.notes(["DIMENSIONS ARE NOMINAL."])
-sh.title_block(title="WIDGET\nDIMENSIONS", drawing_number="ACME-0001", rev="A")
-v = sh.view(x=300, y=300, scale=3.0, name="front")
-body = v.rect(0, 0, 60, 40, r=4)
-v.dim_h(body.tl, body.tr, offset=10, ref=body, label="PRODUCT\nWIDTH")
-v.dim_v(body.tr, body.br, offset=10, ref=body, label="PRODUCT\nHEIGHT")
-sh.save("out/widget.svg", pdf=True)      # prints the CHECK report
-```
-
-The skill's `SKILL.md` is the workflow the agent follows. The full API is in
-`references/api.md`, and the guide to modelling complex objects is in
-`references/modeling.md`.
 
 ## What's in the folder
 
@@ -155,17 +159,10 @@ skills/dimensional-drawing/
   examples/car.py             3-D vehicle: lofted body, wheels, package dimensions, ramp angles
 ```
 
-Run an example with `python3 skills/dimensional-drawing/examples/car.py`. Output goes to
-`skills/dimensional-drawing/examples/out/`.
-
-## Development
-
-```sh
-python3 -m unittest discover -s tests -v          # library unit tests
-python3 skills/dimensional-drawing/scripts/selftest.py   # render every example, fail on any check problem
-```
-
-CI runs both on Python 3.9, 3.12 and 3.13.
+Run an example with `python3 skills/dimensional-drawing/examples/car.py`; output goes to
+`skills/dimensional-drawing/examples/out/`. Running
+`python3 skills/dimensional-drawing/scripts/selftest.py` renders every example and fails on
+any check problem.
 
 ## Limitations
 
